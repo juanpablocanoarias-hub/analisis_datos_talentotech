@@ -40,3 +40,6 @@ data_location.to_csv('dataset_location.csv', index = False)
 
 #Inicio 3.2.py
 
+data_location.drop(columns=['Código Recurso', 'Código Agente', 'Tipo Despacho', 'Es Menor','Version','Código SIC'], inplace=True)
+
+data_location.info()
