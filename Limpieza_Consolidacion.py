@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-path = 'C:\\Users\\juan.cano-a\\Desktop\\Generacion_(kWh).xlsx'
+path = 'CSV\Generacion_(kWh).xlsx'
 data_frame_raw = pd.read_excel(path, skiprows=2, sheet_name="Generacion_(kWh)")
 
 print(data_frame_raw.columns.tolist())
@@ -21,16 +21,22 @@ data_frame_raw['produccion_diaria'] = data_frame_raw['0'] + data_frame_raw['1'] 
 
 data_frame_raw.to_csv('data_frame_rawset_limpia.csv', index = False)
 
-#Inicio 3.2.py
+#Inicio 3.1.py
 
-path2 = 'C:\\Users\\juan.cano-a\\Desktop\\Listado_Recursos_Generacion.xlsx'
+
+path2 = 'CSV\Listado_Recursos_Generacion.xlsx'
 location = pd.read_excel(path2, skiprows=3, sheet_name="Listado_Recursos_Generacion")
 
-data_loc = data.merge(
+
+
+data_location = data_frame_raw.merge(
     location[["Código SIC", "Municipio", "Departamento"]],
     left_on='Código Recurso',
     right_on='Código SIC',
     how='left'
 )
 
-data_loc.to_csv('dataset_loc.csv', index = False)
+data_location.to_csv('dataset_location.csv', index = False)
+
+#Inicio 3.2.py
+
