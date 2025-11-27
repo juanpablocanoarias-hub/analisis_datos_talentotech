@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Cargar datos
-df = pd.read_csv("dataset_location.csv")
+df = pd.read_csv("dataset_final.csv")
 
 # Definir combustibles verdes
 verdes = ["AGUA", "RAD SOLAR", "BIOGAS", "BAGAZO"]
