@@ -6,15 +6,15 @@ import seaborn as sns
 path = 'CSV\Generacion_(kWh).xlsx'
 data_frame_raw = pd.read_excel(path, skiprows=2, sheet_name="Generacion_(kWh)")
 
-print(data_frame_raw.columns.tolist())
+#print(data_frame_raw.columns.tolist())
 
 cols = ["Recurso"]
 
-print(data_frame_raw['Recurso'].value_counts())
+#print(data_frame_raw['Recurso'].value_counts())
 print('\n')
-print(data_frame_raw.isna().sum())
+#print(data_frame_raw.isna().sum())
 print('\n')
-print(data_frame_raw.duplicated().sum())
+#print(data_frame_raw.duplicated().sum())
 print('\n')
 
 data_frame_raw['produccion_diaria'] = data_frame_raw['0'] + data_frame_raw['1'] + data_frame_raw['2'] + data_frame_raw['3'] + data_frame_raw['4'] + data_frame_raw['5'] + data_frame_raw['6'] + data_frame_raw['7'] + data_frame_raw['8'] + data_frame_raw['9'] + data_frame_raw['10'] + data_frame_raw['11'] + data_frame_raw['12'] + data_frame_raw['13'] + data_frame_raw['14'] + data_frame_raw['15'] + data_frame_raw['16'] + data_frame_raw['17'] + data_frame_raw['18'] + data_frame_raw['19'] + data_frame_raw['20'] + data_frame_raw['21'] + data_frame_raw['22'] + data_frame_raw['23']
@@ -46,3 +46,26 @@ data_location.dropna(inplace=True)
 
 data_location.to_csv('dataset_final.csv', index = False)
 
+#analisis de datos
+
+path3 = 'dataset_final.csv'
+data_final = pd.read_csv(path3)
+
+print(f'{data_final.describe()}')
+print(data_final.info())
+
+produccion_por_combustible = data_final.groupby('Combustible')['produccion_diaria'].sum().sort_values(ascending=False)
+produccion_por_recurso = data_final.groupby('Recurso')['produccion_diaria'].sum().sort_values(ascending=False)
+produccion_por_departamento = data_final.groupby('Departamento')['produccion_diaria'].sum().sort_values(ascending=False)
+produccion_por_municipio = data_final.groupby('Municipio')['produccion_diaria'].sum().sort_values(ascending=False)
+produccion_por_tipo_generacion = data_final.groupby('Tipo Generación')['produccion_diaria'].sum().sort_values(ascending=False)
+print(produccion_por_combustible)
+print('\n')
+print(produccion_por_recurso)
+print('\n')
+print(produccion_por_departamento)
+print('\n')
+print(produccion_por_municipio)
+print('\n')
+print(produccion_por_tipo_generacion)
+print('\n')
