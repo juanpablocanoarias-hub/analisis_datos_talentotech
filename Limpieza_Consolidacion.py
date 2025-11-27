@@ -42,4 +42,7 @@ data_location.to_csv('dataset_location.csv', index = False)
 
 data_location.drop(columns=['Código Recurso', 'Código Agente', 'Tipo Despacho', 'Es Menor','Version','Código SIC'], inplace=True)
 
-data_location.info()
+data_location.dropna(inplace=True)
+
+data_location.to_csv('dataset_final.csv', index = False)
+
