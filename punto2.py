@@ -1,28 +1,23 @@
+
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Cargar datos
 df = pd.read_csv("dataset_final.csv")
 
-# Definir combustibles verdes
-verdes = ["AGUA", "RAD SOLAR", "BIOGAS", "BAGAZO"]
+# Contar cuántas generadoras (recursos) hay por cada combustible
+combustibles_count = df.groupby('Combustible')['Recurso'].nunique().sort_values(ascending=False)
 
-# Filtrar recursos verdes
-df_verde = df[df["Combustible"].isin(verdes)]
+# Crear gráfico de barras
+fig, ax = plt.subplots(figsize=(12, 6))
+palette = sns.color_palette("deep")
 
-# Agrupar por Recurso y Tipo de Generación
-agrupado = (df_verde.groupby(["Recurso", "Tipo Generación"])
-            ["produccion_diaria"].sum()
-            .reset_index()
-            .sort_values("produccion_diaria", ascending=False))
+sns.barplot(x=combustibles_count.index, y=combustibles_count.values, ax=ax, palette=palette)
+ax.set_title('Cantidad de Generadoras por Tipo de Combustible', fontsize=14, fontweight='bold')
+ax.set_xlabel('Tipo de Combustible', fontsize=12)
+ax.set_ylabel('Número de Generadoras', fontsize=12)
+ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
 
-# Graficar top 10
-plt.figure(figsize=(10,6))
-plt.barh(agrupado["Recurso"] + " - " + agrupado["Tipo Generación"],
-         agrupado["produccion_diaria"], color="green")
-plt.xlabel("Producción acumulada")
-plt.ylabel("Recurso - Tipo")
-plt.title("Producción total de recursos verdes")
-plt.gca().invert_yaxis()
 plt.tight_layout()
 plt.show()
