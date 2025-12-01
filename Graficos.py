@@ -5,6 +5,7 @@ import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from plotly.offline import plot
 
 df = pd.read_csv("dataset_final.csv")
 columnas_horarias = ['0','1','2','3','4','5','6','7','8','9','10','11','12',
@@ -147,14 +148,61 @@ plt.grid(True, alpha=0.3, axis='y')
 plt.tight_layout()
 plt.show()
 
+produccion_mes_combustible = df.groupby(['mes', 'Combustible'])['produccion_diaria_GWh'].sum().unstack().fillna(0)
+top_combustibles = df.groupby('Combustible')['produccion_diaria_GWh'].sum().nlargest(13).index
+produccion_mes_combustible = produccion_mes_combustible[top_combustibles]
+produccion_mes_combustible.plot(kind='bar', stacked=True, figsize=(15, 8))
+plt.title('Producción Mensual por Combustible', fontsize=14, fontweight='bold')
+plt.ylabel('Producción (GWh)')
+plt.xlabel('Mes')
+plt.xticks(range(12), ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'], rotation=0)
+plt.legend(title='Combustible', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.grid(True, alpha=0.3, axis='y')
+plt.tight_layout()
+plt.show()
+
+produccion_departamento = df.groupby('Departamento')['produccion_diaria_GWh'].sum().sort_values(ascending=False)
+produccion_municipio = df.groupby(['Departamento', 'Municipio'])['produccion_diaria_GWh'].sum().reset_index()
+top_departamentos = produccion_departamento.head(15)
+top_municipios = produccion_municipio.nlargest(15, 'produccion_diaria_GWh')
+
+plt.figure(figsize=(14, 8))
+bars = plt.barh(top_departamentos.index, top_departamentos.values, color='teal')
+plt.title('Top 15 Departamentos por Producción Eléctrica', fontsize=16, fontweight='bold')
+plt.xlabel('Producción Total (GWh)')
+plt.ylabel('Departamento')
+plt.grid(True, alpha=0.3, axis='x')
+for bar in bars:
+    width = bar.get_width()
+    plt.text(width, bar.get_y() + bar.get_height()/2, 
+             f'{width:,.0f}', ha='left', va='center', fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+df_plot = df.groupby(['Fecha', 'Tipo Generación'])['produccion_diaria_GWh'].sum().unstack()
+plt.figure(figsize=(14, 8))
+for tipo in df_plot.columns:
+    plt.plot(df_plot.index, df_plot[tipo], label=tipo, linewidth=2)
+plt.title('Evolución de Producción por Tipo')
+plt.ylabel('Producción (GWh)')
+plt.xlabel('Fecha')
+plt.legend(title='Tipo Generación', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.grid(True, alpha=0.3)
+plt.tight_layout()
+plt.show()
+
 fig = px.line(df.groupby(['Fecha', 'Tipo Generación'])['produccion_diaria_GWh'].sum().reset_index(),
               x='Fecha', y='produccion_diaria_GWh', color='Tipo Generación',
               title='Evolución de Producción por Tipo (Interactivo)')
-fig.show()
+plot(fig, filename='produccion_por_tipo.html', auto_open=True)
 
+#fig = px.line(df.groupby(['Fecha', 'Tipo Generación'])['produccion_diaria_GWh'].sum().reset_index(),
+#              x='Fecha', y='produccion_diaria_GWh', color='Tipo Generación',
+#              title='Evolución de Producción por Tipo (Interactivo)')
+#fig.show()
 
 """Genera un resumen del dataset con la estructura actual"""
-print("📊 RESUMEN ACTUALIZADO - DATOS DIARIOS")
+print("RESUMEN - DATOS DIARIOS")
 print("=" * 50)
 print(f"Período: {df['Fecha'].min().strftime('%d/%m/%Y')} a {df['Fecha'].max().strftime('%d/%m/%Y')}")
 print(f"Días analizados: {df['Fecha'].nunique()}")
@@ -162,7 +210,7 @@ print(f"Producción total: {df['produccion_diaria_GWh'].sum():,.1f} GWh")
 print(f"Producción promedio diaria: {df['produccion_diaria_GWh'].mean():.1f} GWh")
 print(f"Centrales eléctricas: {df['Recurso'].nunique()}")
 
-print("\n🔧 Tipos de generación:")
+print("\n Tipos de generación:")
 for tipo, prod in df.groupby('Tipo Generación')['produccion_diaria_GWh'].sum().items():
     porcentaje = (prod / df['produccion_diaria_GWh'].sum()) * 100
     print(f"  - {tipo}: {prod:,.1f} GWh ({porcentaje:.1f}%)")
